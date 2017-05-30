@@ -31,8 +31,13 @@ export interface AddProp {
 	color: Color
 }
 
+export interface NextRandom {
+	type: 'NextRandom'
+}
+
 export type Action
 	= Init
 	| MoveProp
 	| AddProp
 	| SetTile
+	| NextRandom

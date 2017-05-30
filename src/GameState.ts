@@ -1,19 +1,22 @@
 import { Tile } from './Tile'
 import { Prop } from './Prop'
 import { List, Record } from 'immutable'
+import { Prng } from 'tspersistentprng'
 
 export type GameStateParams = {
 	width?: number
 	height?: number
 	tiles?: List<Tile>
 	props?: List<Prop>
+	prng?: Prng
 }
 
 export const DefaultGameStateParams = {
 	width: 0,
 	height: 0,
 	tiles: List<Tile>(),
-	props: List<Prop>()
+	props: List<Prop>(),
+	prng: new Prng()
 }
 
 export class GameState extends Record( DefaultGameStateParams ) {
@@ -21,13 +24,22 @@ export class GameState extends Record( DefaultGameStateParams ) {
 	height: number
 	tiles: List<Tile>
 	props: List<Prop>
-	
+	prng: Prng
+
 	constructor( params?: GameStateParams ) {
 		params ? super( params ) : super()
 	}
 
 	with( values: GameStateParams ) {
 		return this.merge( values ) as this
+	}
+
+	random( min: number = 0, max: number = 1 ) {
+		return this.prng.random( min, max )
+	}
+
+	nextRandom() {
+		return this.update( 'prng', prng => prng.next())
 	}
 
 	setTile( x: number, y: number, tile: Tile ) {

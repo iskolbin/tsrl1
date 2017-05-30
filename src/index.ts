@@ -61,6 +61,10 @@ function gameReducer( state = new GameState(), action: Action ) {
 			}
 		}
 
+		case 'NextRandom': {
+			return state.nextRandom()
+		}
+
 		default: {
 			return state
 		}
@@ -85,6 +89,7 @@ function render() {
 store.subscribe( render )
 
 store.dispatch( { type: 'Init', width: SCREEN_WIDTH, height: SCREEN_HEIGHT } )
+const wallId = store.getState().getNextPropId()
 store.dispatch( { type: 'SetTile', x: 10, y: 10, ch: '#', color: '#101010', blocked: true, opaque: true })
 const playerId = store.getState().getNextPropId()
 store.dispatch( { type: 'AddProp', x: 0, y: 0, ch: '@', color: '#ff0000' } )
@@ -94,6 +99,13 @@ const mapping: {[key:string]: () => any} = {
 	A: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: -1, dy: 0 } ),
 	S: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: 0, dy: 1 } ),
 	D: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: 1, dy: 0 } ),
+	X: () => {
+		store.dispatch( { type: 'NextRandom' } )
+		const dx = store.getState().random() <= 0.5 ? -1 : 1
+		store.dispatch( { type: 'NextRandom' } )
+		const dy = store.getState().random() <= 0.5 ? -1 : 1
+		store.dispatch( { type: 'MoveProp', id: wallId, dx: dx, dy: dy })
+	}
 }
 
 controller.installKeyboard( mapping )

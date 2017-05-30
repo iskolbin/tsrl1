@@ -1649,6 +1649,10 @@ tough-cookie@~2.3.0:
   dependencies:
     punycode "^1.4.1"
 
+tspersistentprng@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/tspersistentprng/-/tspersistentprng-0.3.1.tgz#b5fdd2cdb71033c6f18991ada17aa18245ec3fa3"
+
 tty-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
