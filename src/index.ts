@@ -5,15 +5,12 @@ import { GameState } from './GameState'
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { List } from 'immutable'
-import { now } from 'tsnow'
 
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
 
 const SCREEN_WIDTH = 40
 const SCREEN_HEIGHT = 30
-
-console.log( now())
 
 const controller = new Html5WindowController()
 const renderer = new Html5CanvasRenderer( 'root', SCREEN_WIDTH, SCREEN_HEIGHT, { fontFamily: 'monospace', fontSize: 24 } )
