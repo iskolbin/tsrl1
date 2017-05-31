@@ -2,9 +2,10 @@ import { Action } from './Action'
 import { Tile } from './Tile'
 import { Prop } from './Prop'
 import { GameState } from './GameState'
+import { Prng } from 'tspersistentprng'
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import { List } from 'immutable'
+//import { List } from 'immutable'
 
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
@@ -19,23 +20,19 @@ function gameReducer( state = new GameState(), action: Action ) {
 	switch ( action.type ) {
 		case 'Init': {
 			const { width, height } = action
-			return state
-				.set( 'tiles', ( () => {
-					const tiles: Tile[] = []
-					for ( let y = 0; y < height; y++ ) {
-						for ( let x = 0; x < width; x++ ) {
-							tiles.push( new Tile())
-						}
-					}
-					return List<Tile>( tiles )
-				})())
-				.set( 'width', width )
-				.set( 'height', height )
+			return state.update( 'dungeon', dungeon => dungeon.with( {
+				width,
+				height,
+				prng: new Prng( 123 ),
+				createBlockedTile: () => new Tile({ch: '#', color: '#101010', blocked: true, opaque: true }),
+				createFreeTile: () => new Tile({ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
+			}).clear().generate( 5, 3, 20 ))
 		}
 
 		case 'SetTile': {
-			const { x, y, ch, color, blocked, opaque } = action
-			return state.setTile( x, y, new Tile( { ch, color, blocked, opaque } ))
+			//const { x, y, w, h, ch, color, blocked, opaque } = action
+			//return state.setTile( x, y, w, h, () => new Tile( { ch, color, blocked, opaque } ))
+			return state
 		}
 
 		case 'AddProp': {
@@ -48,7 +45,7 @@ function gameReducer( state = new GameState(), action: Action ) {
 			const prop = state.props.get( id )
 			if ( prop !== undefined ) {
 				const { x, y } = prop
-				if ( !state.isBlocked( x + dx, y + dy )) {
+				if ( !state.dungeon.isBlocked( x + dx, y + dy )) {
 					return state.update( 'props',
 						props => props.update( id, (prop: Prop) => prop
 							.update( 'x', (x: number) => x + dx )
@@ -77,8 +74,8 @@ function render() {
 	const state = store.getState()
 	renderer.clear()
 	let i = 0
-	state.tiles.forEach( ({ch, color}: Tile ) => {
-		const [x,y] = state.getTileXy( i++ )
+	state.dungeon.tiles.forEach( ({ch, color}: Tile ) => {
+		const [x,y] = state.dungeon.getTileXy( i++ )
 		renderer.draw( ch, x, y, 1, 1, color )
 	})
 	state.props.forEach( ({x, y, ch, color}: Prop ) => {
@@ -89,9 +86,8 @@ function render() {
 store.subscribe( render )
 
 store.dispatch( { type: 'Init', width: SCREEN_WIDTH, height: SCREEN_HEIGHT } )
-store.dispatch( { type: 'SetTile', x: 10, y: 10, ch: '#', color: '#101010', blocked: true, opaque: true })
 const playerId = store.getState().getNextPropId()
-store.dispatch( { type: 'AddProp', x: 0, y: 0, ch: '@', color: '#ff0000' } )
+store.dispatch( { type: 'AddProp', x: 9, y: 9, ch: '@', color: '#ff0000' } )
 
 const mapping: {[key:string]: () => any} = {
 	W: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: 0, dy: -1 } ),

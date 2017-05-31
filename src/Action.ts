@@ -10,6 +10,8 @@ export interface SetTile {
 	type: 'SetTile'
 	x: number
 	y: number
+	w: number
+	h: number
 	ch: string
 	color: Color
 	blocked: boolean
