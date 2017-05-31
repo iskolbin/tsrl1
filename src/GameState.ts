@@ -39,13 +39,13 @@ export class GameState extends Record( DefaultGameStateParams ) {
 	}
 
 	nextRandom() {
-		return this.update( 'prng', prng => prng.next())
+		return this.update( 'prng', prng => prng.next()) as GameState
 	}
 
 	setTile( x: number, y: number, tile: Tile ) {
 		return this.isInside( x, y ) ? 
 			this.update( 'tiles', tiles => 
-				tiles.set( this.getTileIndex( x, y ), tile )) :
+				tiles.set( this.getTileIndex( x, y ), tile )) as GameState:
 			this
 	}
 

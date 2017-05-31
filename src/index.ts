@@ -5,12 +5,15 @@ import { GameState } from './GameState'
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { List } from 'immutable'
+import { now } from 'tsnow'
 
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
 
 const SCREEN_WIDTH = 40
 const SCREEN_HEIGHT = 30
+
+console.log( now())
 
 const controller = new Html5WindowController()
 const renderer = new Html5CanvasRenderer( 'root', SCREEN_WIDTH, SCREEN_HEIGHT, { fontFamily: 'monospace', fontSize: 24 } )
@@ -89,7 +92,6 @@ function render() {
 store.subscribe( render )
 
 store.dispatch( { type: 'Init', width: SCREEN_WIDTH, height: SCREEN_HEIGHT } )
-const wallId = store.getState().getNextPropId()
 store.dispatch( { type: 'SetTile', x: 10, y: 10, ch: '#', color: '#101010', blocked: true, opaque: true })
 const playerId = store.getState().getNextPropId()
 store.dispatch( { type: 'AddProp', x: 0, y: 0, ch: '@', color: '#ff0000' } )
@@ -104,7 +106,7 @@ const mapping: {[key:string]: () => any} = {
 		const dx = store.getState().random() <= 0.5 ? -1 : 1
 		store.dispatch( { type: 'NextRandom' } )
 		const dy = store.getState().random() <= 0.5 ? -1 : 1
-		store.dispatch( { type: 'MoveProp', id: wallId, dx: dx, dy: dy })
+		store.dispatch( { type: 'MoveProp', id: playerId, dx: dx, dy: dy })
 	}
 }
 
