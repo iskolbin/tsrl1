@@ -23,8 +23,8 @@ Thumbs.db
 node_modules/
 
 # Output folder.
-dist/
 !dist/index.html
+dist/
 lib/
 
 # Compiled files
