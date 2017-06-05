@@ -1,14 +1,19 @@
 {
+  "scripts": {
+    "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --content-base dist/ --inline --hot"
+  },
   "dependencies": {
     "immutable": "3.8.1",
     "redux": "^3.6.0",
     "ts-loader": "^2.1.0",
-    "tspersistentprng": "^0.3.3"
+    "tspersistentprng": "^0.3.3",
+    "tsshadowcasting2d": "^0.2.1"
   },
   "devDependencies": {
     "redux-devtools-extension": "^2.13.2",
     "source-map-loader": "^0.2.1",
     "typescript": "^2.3.3",
-    "webpack": "^2.6.1"
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
   }
 }

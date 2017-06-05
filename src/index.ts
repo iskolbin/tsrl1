@@ -5,7 +5,7 @@ import { GameState } from './GameState'
 import { Prng } from 'tspersistentprng'
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
-//import { List } from 'immutable'
+import { List } from 'immutable'
 
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
@@ -37,7 +37,7 @@ function gameReducer( state = new GameState(), action: Action ) {
 
 		case 'AddProp': {
 			const { x, y, ch, color } = action
-			return state.update( 'props', props => props.push( new Prop( {x: x, y: y, ch: ch, color: color})))
+			return state.update( 'props', (props: List<Prop>) => props.push( new Prop( {x: x, y: y, ch: ch, color: color})))
 		}
 
 		case 'MoveProp': {

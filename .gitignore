@@ -24,6 +24,7 @@ node_modules/
 
 # Output folder.
 dist/
+!dist/index.html
 lib/
 
 # Compiled files
