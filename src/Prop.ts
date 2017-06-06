@@ -1,6 +1,6 @@
 import { Color } from './Color'
-import { Record } from 'immutable'
-
+import { Struct } from './Struct'
+	
 export type PropParams = {
 	x?: number
 	y?: number
@@ -8,24 +8,14 @@ export type PropParams = {
 	color?: Color
 }
 
-export const DefaultPropParams = {
-	x: 0,
-	y: 0,
-	ch: ' ',
-	color: '#000000'
-} 
-
-export class Prop extends Record( DefaultPropParams ) {
-	x: number
-	y: number
-	ch: string
-	color: Color
+export class Prop extends Struct {
+	x: number = 0
+	y: number = 0
+	ch: string = ' '
+	color: Color = '#000000'
 
 	constructor( params?: PropParams ) {
-		params ? super( params ) : super()
-	}
-
-	with( values: PropParams ) {
-		return this.merge( values ) as this
+		super()
+		this.init( params )
 	}
 }

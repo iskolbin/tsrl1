@@ -26,7 +26,7 @@ function gameReducer( state = new GameState(), action: Action ) {
 				prng: new Prng( 123 ),
 				createBlockedTile: () => new Tile({ch: '#', color: '#101010', blocked: true, opaque: true }),
 				createFreeTile: () => new Tile({ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
-			}).clear().generate( 5, 3, 20 ))
+			}).clear().generate( 5, 3, 20 )).initLights() 
 		}
 
 		case 'SetTile': {
@@ -37,7 +37,8 @@ function gameReducer( state = new GameState(), action: Action ) {
 
 		case 'AddProp': {
 			const { x, y, ch, color } = action
-			return state.update( 'props', (props: List<Prop>) => props.push( new Prop( {x: x, y: y, ch: ch, color: color})))
+			const prop = new Prop( {x: x, y: y, ch: ch, color: color})
+			return state.update( 'props', (props: List<Prop>) => props.push( prop ))
 		}
 
 		case 'MoveProp': {
@@ -46,10 +47,11 @@ function gameReducer( state = new GameState(), action: Action ) {
 			if ( prop !== undefined ) {
 				const { x, y } = prop
 				if ( !state.dungeon.isBlocked( x + dx, y + dy )) {
-					return state.update( 'props',
+					let newState = state.update( 'props',
 						props => props.update( id, (prop: Prop) => prop
 							.update( 'x', (x: number) => x + dx )
 							.update( 'y', (y: number) => y + dy )))
+					return newState.lights.illuminate( newState, x + dx, y + dy, 5 )
 				} else {
 					return state
 				}
@@ -74,9 +76,9 @@ function render() {
 	const state = store.getState()
 	renderer.clear()
 	let i = 0
-	state.dungeon.tiles.forEach( ({ch, color}: Tile ) => {
+	state.dungeon.tiles.forEach( ({ch, color, explored}: Tile ) => {
 		const [x,y] = state.dungeon.getTileXy( i++ )
-		renderer.draw( ch, x, y, 1, 1, color )
+		renderer.draw( ch, x, y, 1, 1, explored ? color : '#000' )
 	})
 	state.props.forEach( ({x, y, ch, color}: Prop ) => {
 		renderer.draw( ch, x, y, 1, 1, color )

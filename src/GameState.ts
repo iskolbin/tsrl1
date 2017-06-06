@@ -1,19 +1,18 @@
 import { Prop } from './Prop'
 import { Dungeon } from './Dungeon'
-import { Tile } from './Tile'
-import { List, Record } from 'immutable'
+import { Struct } from './Struct'
+import { List } from 'immutable'
 import { Prng } from 'tspersistentprng'
 import { ShadowCasting2D } from 'tsshadowcasting2d'
+import { Tile } from './Tile'
 
 export type GameStateParams = {
-	width?: number
-	height?: number
 	props?: List<Prop>
 	prng?: Prng
 	dungeon?: Dungeon
 	lights?: ShadowCasting2D<GameState>
 }
-
+	/*
 export const DefaultGameStateParams = {
 	width: 0,
 	height: 0,
@@ -32,22 +31,17 @@ export const DefaultGameStateParams = {
 			}
 		}
 	)
-}
+}*/
 
-export class GameState extends Record( DefaultGameStateParams ) {
-	width: number
-	height: number
-	props: List<Prop>
-	prng: Prng
-	dungeon: Dungeon
-	lights: ShadowCasting2D<any>
+export class GameState extends Struct {
+	props: List<Prop> = List<Prop>()
+	prng: Prng = new Prng()
+	dungeon: Dungeon = new Dungeon()
+	lights: ShadowCasting2D<GameState>
 
 	constructor( params?: GameStateParams ) {
-		params ? super( params ) : super()
-	}
-
-	with( values: GameStateParams ) {
-		return this.merge( values ) as this
+		super()
+		this.init( params )
 	}
 
 	random( min: number = 0, max: number = 1 ) {
@@ -55,10 +49,24 @@ export class GameState extends Record( DefaultGameStateParams ) {
 	}
 
 	nextRandom() {
-		return this.update( 'prng', prng => prng.next()) as GameState
+		return this.update( 'prng', prng => prng.next())
 	}
 
 	getNextPropId() {
 		return this.props.size
+	}
+
+	initLights() {
+		return this.set( 'lights', new ShadowCasting2D<GameState>(
+			( state ) => [0, 0, state.dungeon.width-1, state.dungeon.height-1],
+			( state, x, y ) => state.dungeon.getTile( x, y ).blocked,
+			( state, x ,y ) => {
+				if ( state.dungeon.getTile( x, y ).explored ) {
+					return state
+				} else {
+					return state.update( 'dungeon', dungeon => dungeon.updateTile( x, y, (_x,_y,t) => t.set( 'explored', true ) as Tile ))
+				}
+			}
+		))
 	}
 }

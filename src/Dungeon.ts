@@ -49,7 +49,7 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 	}
 
 	createRoom( x: number, y: number, w: number, h: number ) {
-		return this.setTile( x, y, w, h, this.createFreeTile ) as Dungeon
+		return this.updateTiles( x, y, w, h, this.createFreeTile ) as Dungeon
 	}
 
 	createTunnelH( x0: number, x1: number, y: number ) {
@@ -121,15 +121,32 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 		return current.set( 'prng', prng ) as Dungeon
 	}
 
-	setTile( x: number, y: number, w: number, h: number, fTile: () => Tile ) {
+	setTile( x: number, y: number, tile: Tile ) {
+		if ( x >= 0 && x < this.width && y >= 0 && y < this.height ) {
+			return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), tile )) as Dungeon
+		} else {
+			return this
+		}
+	}
+
+	updateTile( x: number, y: number, fTile: (x: number, y: number, t: Tile) => Tile ) {
+		if ( x >= 0 && x < this.width && y >= 0 && y < this.height ) {
+			return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), fTile( x, y, this.getTile( x, y )))) as Dungeon
+		} else {
+			return this
+		}
+	}
+
+	updateTiles( x: number, y: number, w: number, h: number, fTile: (x: number, y: number, t: Tile) => Tile ) {
 		const x0 = Math.max( 0, x )
-		const x1 = Math.min( this.width - x0, x + w )
+		const x1 = Math.min( this.width, x + w )
 		const y0 = Math.max( 0, y )
-		const y1 = Math.min( this.height - y0, y + h )
+		const y1 = Math.min( this.height, y + h )
 		let tiles = this.tiles
 		for ( let x = x0; x < x1; x++ ) {
 			for ( let y = y0; y < y1; y++ ) {
-				tiles = tiles.set( this.getTileIndex( x, y ), fTile())
+				const index = this.getTileIndex( x, y )
+				tiles = tiles.set( index, fTile( x, y, this.getTile( x, y )))
 			}
 		}
 		return this.set( 'tiles', tiles ) as Dungeon 
