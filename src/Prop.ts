@@ -1,12 +1,5 @@
 import { Color } from './Color'
-import { Struct } from './Struct'
-	
-export type PropParams = {
-	x?: number
-	y?: number
-	ch?: string
-	color?: Color
-}
+import { Struct, init } from './Struct'
 
 export class Prop extends Struct {
 	x: number = 0
@@ -14,8 +7,8 @@ export class Prop extends Struct {
 	ch: string = ' '
 	color: Color = '#000000'
 
-	constructor( params?: PropParams ) {
+	constructor( params?: Partial<Prop> ) {
 		super()
-		this.init( params )
+		init<Prop>( this, params )
 	}
 }

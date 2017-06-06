@@ -6,7 +6,7 @@ import { Prng } from 'tspersistentprng'
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { List } from 'immutable'
-
+import { Dungeon } from './Dungeon'
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
 
@@ -20,13 +20,15 @@ function gameReducer( state = new GameState(), action: Action ) {
 	switch ( action.type ) {
 		case 'Init': {
 			const { width, height } = action
-			return state.update( 'dungeon', dungeon => dungeon.with( {
+
+			console.log( "INIT" )
+			return state.set( 'dungeon', new Dungeon( {
 				width,
 				height,
 				prng: new Prng( 123 ),
 				createBlockedTile: () => new Tile({ch: '#', color: '#101010', blocked: true, opaque: true }),
 				createFreeTile: () => new Tile({ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
-			}).clear().generate( 5, 3, 20 )).initLights() 
+			}).clear().generate( 5, 3, 20 ))
 		}
 
 		case 'SetTile': {

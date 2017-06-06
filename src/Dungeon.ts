@@ -1,36 +1,20 @@
-import { List, Record } from 'immutable'
+import { Struct, init } from './Struct'
+import { List } from 'immutable'
 import { Rectangle } from './Rectangle'
 import { Tile } from './Tile'
 import { Prng } from 'tspersistentprng'
 
-export type DungeonParams = {
-	width?: number
-	height?: number
-	tiles?: List<Tile>
-	prng?: Prng
-	createBlockedTile: () => Tile
-	createFreeTile: () => Tile
-}
+export class Dungeon extends Struct {
+	width: number = 1
+	height: number = 1
+	tiles: List<Tile> = List<Tile>([])
+	prng: Prng = new Prng()
+	createBlockedTile: () => Tile = () => new Tile()
+	createFreeTile: () => Tile = () => new Tile()
 
-export const DefaultDungeonParams = {
-	width: 1,
-	height: 1,
-	tiles: List<Tile>([]),
-	prng: new Prng(),
-	createBlockedTile: () => new Tile(), 
-	createFreeTile: () => new Tile()
-}
-
-export class Dungeon extends Record( DefaultDungeonParams ) {
-	width: number
-	height: number
-	tiles: List<Tile>
-	prng: Prng
-	createBlockedTile: () => Tile 
-	createFreeTile: () => Tile
-
-	constructor( params?: DungeonParams ) {
-		params ? super( params ) : super()
+	constructor( params?: Partial<Dungeon> ) {
+		super()
+		init<Dungeon>( this, params )
 	}
 
 	clear(): Dungeon {
@@ -41,15 +25,11 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 				tiles = tiles.set( i++, this.createBlockedTile() )
 			}
 		}
-		return this.set( 'tiles', tiles ) as Dungeon
-	}
-
-	with( values: DungeonParams ) {
-		return this.merge( values ) as this
+		return this.set( 'tiles', tiles )
 	}
 
 	createRoom( x: number, y: number, w: number, h: number ) {
-		return this.updateTiles( x, y, w, h, this.createFreeTile ) as Dungeon
+		return this.updateTiles( x, y, w, h, this.createFreeTile )
 	}
 
 	createTunnelH( x0: number, x1: number, y: number ) {
@@ -63,7 +43,7 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 				tiles = tiles.set( this.getTileIndex( x, y ), this.createFreeTile() )
 			}
 		}
-		return this.set( 'tiles', tiles ) as Dungeon
+		return this.set( 'tiles', tiles )
 	}
 
 	createTunnelV( y0: number, y1: number, x: number ) {
@@ -77,7 +57,16 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 				tiles = tiles.set( this.getTileIndex( x, y ), this.createFreeTile() )
 			}
 		}
-		return this.set( 'tiles', tiles ) as Dungeon
+		return this.set( 'tiles', tiles )
+	}
+
+	with2( o: Partial<this> ) {
+		console.log( "OBJ", o )
+		const r = this.with( o )
+		console.log( r )
+		console.log( "BLOCKER", (o as any).createBlockedTile() )
+		console.log( (r as any).createBlockedTile() )
+		return r
 	}
 
 	generate( minSize: number, maxSize: number, count: number ) {
@@ -118,12 +107,13 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 				rooms.push( newRoom )
 			}
 		}
-		return current.set( 'prng', prng ) as Dungeon
+		console.log( current )
+		return current.set( 'prng', prng )
 	}
 
 	setTile( x: number, y: number, tile: Tile ) {
 		if ( x >= 0 && x < this.width && y >= 0 && y < this.height ) {
-			return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), tile )) as Dungeon
+			return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), tile ))
 		} else {
 			return this
 		}
@@ -131,7 +121,7 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 
 	updateTile( x: number, y: number, fTile: (x: number, y: number, t: Tile) => Tile ) {
 		if ( x >= 0 && x < this.width && y >= 0 && y < this.height ) {
-			return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), fTile( x, y, this.getTile( x, y )))) as Dungeon
+			return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), fTile( x, y, this.getTile( x, y ))))
 		} else {
 			return this
 		}
@@ -149,7 +139,7 @@ export class Dungeon extends Record( DefaultDungeonParams ) {
 				tiles = tiles.set( index, fTile( x, y, this.getTile( x, y )))
 			}
 		}
-		return this.set( 'tiles', tiles ) as Dungeon 
+		return this.set( 'tiles', tiles ) 
 	}
 
 	getTileIndex( x: number, y: number ) {

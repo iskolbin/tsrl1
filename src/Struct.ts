@@ -1,13 +1,19 @@
-export function init<T, K extends keyof T>( obj: T, kvs: {[key: string]: T[K]} ): void {
-	for ( const k in kvs ) {
-		(obj as any)[k] = kvs[k]
+export function init<T extends { [key: string]: any }>( obj: T, kvs?: Partial<T> ): void {
+	if ( kvs ) {
+		for ( const k in kvs ) {
+			if ( kvs.hasOwnProperty( k )) {
+				obj[k] = kvs[k]
+			}
+		}
 	}
 }
 
 export function copy<T>( obj: T ): T {
 	const result = Object.create( Object.getPrototypeOf( obj ))
 	for ( const k in obj ) {
-		result[k] = obj[k]
+		if ( obj.hasOwnProperty( k )) {
+			result[k] = obj[k]
+		}
 	}
 	return result
 }
@@ -18,10 +24,14 @@ export function set<T, K extends keyof T>( obj: T, key: K, value: T[K] ): T {
 	return result
 }
 
-export function merge<T, K extends keyof T>( obj: T, kvs: {[key: string]: T[K]} ): T {
-	const result = copy( obj )
-	init( result, kvs )
-	return result
+export function merge<T>( obj: T, kvs?: Partial<T> ): T {
+	if ( kvs ) {
+		const result = copy( obj )
+		init( result, kvs )
+		return result
+	} else {
+		return obj
+	}
 }
 
 export function update<T, K extends keyof T>( obj: T, key: K, updater: (value: T[K], key: K, obj: T) => T[K] ): T {
@@ -29,25 +39,19 @@ export function update<T, K extends keyof T>( obj: T, key: K, updater: (value: T
 }
 
 export class Struct {
-	init( kvs?: any ) {
-		if ( kvs !== undefined ) {
-			init( this, kvs )
-		}
-	}
-
-	copy() {
+	copy(): this {
 		return copy( this )
 	}
 
-	set<K extends keyof this>( key: K, value: this[K] ) {
+	set<K extends keyof this>( key: K, value: this[K] ): this {
 		return set( this, key, value )
 	}
 
-	update<K extends keyof this>( key: K, updater: (value: this[K], key: K, obj: this) => this[K] ) {
+	update<K extends keyof this>( key: K, updater: (value: this[K], key: K, obj: this) => this[K] ): this {
 		return update( this, key, updater )
 	}
 
-	merge<K extends keyof this>( kvs: any ) {
-		return merge<this,K>( this, kvs )
+	with( kvs: Partial<this> ): this {
+		return merge( this, kvs )
 	}
 }
