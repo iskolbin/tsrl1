@@ -20,8 +20,6 @@ function gameReducer( state = new GameState(), action: Action ) {
 	switch ( action.type ) {
 		case 'Init': {
 			const { width, height } = action
-
-			console.log( "INIT" )
 			return state.set( 'dungeon', new Dungeon( {
 				width,
 				height,
@@ -78,9 +76,13 @@ function render() {
 	const state = store.getState()
 	renderer.clear()
 	let i = 0
-	state.dungeon.tiles.forEach( ({ch, color, explored}: Tile ) => {
+	state.dungeon.tiles.forEach( ({ch, color, explored,visible}: Tile ) => {
 		const [x,y] = state.dungeon.getTileXy( i++ )
-		renderer.draw( ch, x, y, 1, 1, explored ? color : '#000' )
+		if ( visible ) {
+			renderer.draw( ch, x, y, 1, 1, color )
+		} else {
+			renderer.draw( explored ? ch : '?', x, y, 1, 1, '#000' )
+		}
 	})
 	state.props.forEach( ({x, y, ch, color}: Prop ) => {
 		renderer.draw( ch, x, y, 1, 1, color )

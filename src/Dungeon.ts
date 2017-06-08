@@ -60,15 +60,6 @@ export class Dungeon extends Struct {
 		return this.set( 'tiles', tiles )
 	}
 
-	with2( o: Partial<this> ) {
-		console.log( "OBJ", o )
-		const r = this.with( o )
-		console.log( r )
-		console.log( "BLOCKER", (o as any).createBlockedTile() )
-		console.log( (r as any).createBlockedTile() )
-		return r
-	}
-
 	generate( minSize: number, maxSize: number, count: number ) {
 		let current: Dungeon = this
 		let prng = this.prng
@@ -90,7 +81,6 @@ export class Dungeon extends Struct {
 					break
 				}
 			}
-
 			if ( !failed ) {
 				current = current.createRoom( x, y, w, h )
 				if ( rooms.length > 0 ) {
@@ -107,7 +97,6 @@ export class Dungeon extends Struct {
 				rooms.push( newRoom )
 			}
 		}
-		console.log( current )
 		return current.set( 'prng', prng )
 	}
 

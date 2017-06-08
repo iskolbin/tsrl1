@@ -1,6 +1,6 @@
 import { Prop } from './Prop'
 import { Dungeon } from './Dungeon'
-import { Struct, merge } from './Struct'
+import { Struct, init } from './Struct'
 import { List } from 'immutable'
 import { Prng } from 'tspersistentprng'
 import { ShadowCasting2D } from 'tsshadowcasting2d'
@@ -10,21 +10,47 @@ export class GameState extends Struct {
 	props: List<Prop> = List<Prop>()
 	prng: Prng = new Prng()
 	dungeon: Dungeon = new Dungeon()
+	visible: List<[number,number]> = List<[number,number]>()
 	lights: ShadowCasting2D<GameState> = new ShadowCasting2D<GameState>(
 		( state ) => [0, 0, state.dungeon.width-1, state.dungeon.height-1],
-		( state, x, y ) => state.dungeon.getTile( x, y ).blocked,
-		( state, x ,y ) => {
-			if ( state.dungeon.getTile( x, y ).explored ) {
-				return state
+		( state, x, y ) => {
+			const tile = state.dungeon.getTile( x, y )
+			if ( tile === undefined ) {
+				console.log( "BUG!", x, y )
+				return true
 			} else {
-				return state.update( 'dungeon', dungeon => dungeon.updateTile( x, y, (_x,_y,t) => t.set( 'explored', true ) as Tile ))
+				return tile.blocked
 			}
-		}
+		},
+		{
+			onStart: ( state, _x ,_y ) => {
+				let newState = state
+				state.visible.forEach( (xy) => {
+					if ( xy ) {
+						newState = newState.updateTile( xy[0], xy[1], (_x,_y,t) => t.set( 'visible', false ))
+					}	
+				})
+				newState = newState.update( 'visible', visible => visible.clear())
+				return newState
+			},
+			onVisible: ( state, x, y ) => {
+				const newState = state.update( 'visible', visible => visible.push([x,y])).updateTile( x, y, (_x,_y,t) => t.set('visible',true))
+				if ( newState.dungeon.getTile( x, y ).explored ) {
+					return newState
+				} else {
+					return newState.updateTile( x, y, (_x,_y,t) => t.set('explored', true))
+				}
+			},
+		},
 	)
 
 	constructor( params?: Partial<GameState> ) {
 		super()
-		merge( params )
+		init<GameState>( this, params )
+	}
+
+	updateTile( x: number, y: number, updater: (x: number, y: number, t: Tile) => Tile ) {
+		return this.update( 'dungeon', dungeon => dungeon.updateTile( x, y, updater ))
 	}
 
 	random( min: number = 0, max: number = 1 ) {

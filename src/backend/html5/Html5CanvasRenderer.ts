@@ -31,7 +31,7 @@ export class Html5CanvasRenderer {
 	}
 
 	draw( ch: string, x0: number, y0: number, w = 1, h = 1, color?: Color ): void {
-		if ( color ) {
+		if ( color !== undefined ) {
 			this._context.fillStyle = color
 		}
 		for ( let x = 0; x < w; x++ ) {

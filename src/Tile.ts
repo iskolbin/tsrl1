@@ -1,4 +1,4 @@
-import { Struct, merge } from './Struct'
+import { Struct, init } from './Struct'
 import { Color } from './Color'
 
 export class Tile extends Struct {
@@ -11,6 +11,6 @@ export class Tile extends Struct {
 
 	constructor( params?: Partial<Tile> ) {
 		super()
-		merge<Tile>( this, params )
+		init<Tile>( this, params )
 	}
 }
