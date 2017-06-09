@@ -13,15 +13,7 @@ export class GameState extends Struct {
 	visible: List<[number,number]> = List<[number,number]>()
 	lights: ShadowCasting2D<GameState> = new ShadowCasting2D<GameState>(
 		( state ) => [0, 0, state.dungeon.width-1, state.dungeon.height-1],
-		( state, x, y ) => {
-			const tile = state.dungeon.getTile( x, y )
-			if ( tile === undefined ) {
-				console.log( "BUG!", x, y )
-				return true
-			} else {
-				return tile.blocked
-			}
-		},
+		( state, x, y ) => state.dungeon.getTile( x, y ).blocked,
 		{
 			onStart: ( state, _x ,_y ) => {
 				let newState = state
