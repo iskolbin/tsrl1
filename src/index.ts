@@ -5,7 +5,6 @@ import { GameState } from './GameState'
 import { Prng } from 'tspersistentprng'
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import { List } from 'immutable'
 import { Dungeon } from './Dungeon'
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
@@ -38,19 +37,18 @@ function gameReducer( state = new GameState(), action: Action ) {
 		case 'AddProp': {
 			const { x, y, ch, color } = action
 			const prop = new Prop( {x: x, y: y, ch: ch, color: color})
-			return state.update( 'props', (props: List<Prop>) => props.push( prop ))
+			return state.addProp( prop )
 		}
 
 		case 'MoveProp': {
 			const { id, dx, dy } = action
-			const prop = state.props.get( id )
+			const prop = state.getProp( id )
 			if ( prop !== undefined ) {
 				const { x, y } = prop
 				if ( !state.dungeon.isBlocked( x + dx, y + dy )) {
-					let newState = state.update( 'props',
-						props => props.update( id, (prop: Prop) => prop
+					let newState = state.updateProp( id, (prop: Prop) => prop	
 							.update( 'x', (x: number) => x + dx )
-							.update( 'y', (y: number) => y + dy )))
+							.update( 'y', (y: number) => y + dy ))
 					return newState.lights.illuminate( newState, x + dx, y + dy, 5 )
 				} else {
 					return state
@@ -73,7 +71,7 @@ function gameReducer( state = new GameState(), action: Action ) {
 const store = createStore( gameReducer, undefined, composeWithDevTools())
 
 function render() {
-	const state = store.getState()
+	const state: GameState = store.getState()
 	renderer.clear()
 	let i = 0
 	state.dungeon.tiles.forEach( ({ch, color, explored,visible}: Tile ) => {
@@ -84,7 +82,7 @@ function render() {
 			renderer.draw( explored ? ch : '?', x, y, 1, 1, '#000' )
 		}
 	})
-	state.props.forEach( ({x, y, ch, color}: Prop ) => {
+	state.dungeon.props.forEach( ({x, y, ch, color}: Prop ) => {
 		renderer.draw( ch, x, y, 1, 1, color )
 	})
 }

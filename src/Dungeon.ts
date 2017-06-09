@@ -3,6 +3,7 @@ import { List } from 'immutable'
 import { Rectangle } from './Rectangle'
 import { Tile } from './Tile'
 import { Prng } from 'tspersistentprng'
+import { Prop } from './Prop'
 
 export class Dungeon extends Struct {
 	width: number = 1
@@ -11,6 +12,8 @@ export class Dungeon extends Struct {
 	prng: Prng = new Prng()
 	createBlockedTile: () => Tile = () => new Tile()
 	createFreeTile: () => Tile = () => new Tile()
+	props: List<Prop> = List<Prop>()
+	maxRoomMonsters: number = 5
 
 	constructor( params?: Partial<Dungeon> ) {
 		super()
@@ -26,6 +29,11 @@ export class Dungeon extends Struct {
 			}
 		}
 		return this.set( 'tiles', tiles )
+	}
+
+	placeMonsters( _x: number, _y: number, _w: number, _h: number ) {
+			
+		return this
 	}
 
 	createRoom( x: number, y: number, w: number, h: number ) {
@@ -82,7 +90,7 @@ export class Dungeon extends Struct {
 				}
 			}
 			if ( !failed ) {
-				current = current.createRoom( x, y, w, h )
+				current = current.createRoom( x, y, w, h ).placeMonsters( x, y, w, h )
 				if ( rooms.length > 0 ) {
 					const [prevX,prevY] = rooms[rooms.length-1].center()
 					prng = prng.next()

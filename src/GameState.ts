@@ -7,7 +7,6 @@ import { ShadowCasting2D } from 'tsshadowcasting2d'
 import { Tile } from './Tile'
 
 export class GameState extends Struct {
-	props: List<Prop> = List<Prop>()
 	prng: Prng = new Prng()
 	dungeon: Dungeon = new Dungeon()
 	visible: List<[number,number]> = List<[number,number]>()
@@ -53,7 +52,19 @@ export class GameState extends Struct {
 		return this.update( 'prng', prng => prng.next())
 	}
 
+	addProp( prop: Prop ) {
+		return this.update( 'dungeon', dungeon => dungeon.update( 'props', props => props.push( prop )))
+	}
+
+	getProp( id: number ) {
+		return this.dungeon.props.get( id )
+	}
+
+	updateProp( id: number, updater: (prop: Prop) => Prop ) {
+		return this.update( 'dungeon', dungeon => dungeon.update( 'props', props => props.set( id, updater( this.getProp( id )))))
+	}
+	
 	getNextPropId() {
-		return this.props.size
+		return this.dungeon.props.size
 	}
 }
