@@ -30,12 +30,26 @@ export class Dungeon extends Struct {
 		}
 		return this.set( 'tiles', tiles )
 	}
-
-	placeMonsters( _x: number, _y: number, _w: number, _h: number ) {
-			
-		return this
+	
+	placeMonsters( x: number, y: number, w: number, h: number ) {
+		let prng = this.prng
+		let props = this.props
+		prng = prng.next()
+		const x_ = x + (prng.random( 0, w ) | 0)
+		prng = prng.next()
+		const y_ = y + (prng.random( 0, h ) | 0)
+		if ( !this.isBlocked( x_, y_ )) {
+			props = props.push( new Prop( {id:this.getNextPropId(), x: x_, y: y_, ch: 'g', color: '#00ff00', blocked: true} )) 
+			return this.set( 'prng', prng ).set( 'props', props )
+		} else {
+			return this
+		}
 	}
 
+	getNextPropId() {
+		return this.props.size
+	}
+	
 	createRoom( x: number, y: number, w: number, h: number ) {
 		return this.updateTiles( x, y, w, h, this.createFreeTile )
 	}
@@ -79,16 +93,16 @@ export class Dungeon extends Struct {
 			prng = prng.next()
 			const h = prng.random( minSize, maxSize ) | 0
 			prng = prng.next()
-			const x = prng.random( 0, this.width - w - 1 ) | 0
+			const x = prng.random( 1, this.width - w - 2 ) | 0
 			prng = prng.next()
-			const y = prng.random( 0, this.height - h - 1 ) | 0
-			const newRoom: Rectangle = new Rectangle( x, y, w, h )
+			const y = prng.random( 1, this.height - h - 2 ) | 0
+			const newRoom: Rectangle = new Rectangle( x-1, y-1, w+1, h+1 )
 			for ( const room of rooms ) {
 				if ( newRoom.intersect( room )) {
 					failed = true
 					break
 				}
-			}
+			}	
 			if ( !failed ) {
 				current = current.createRoom( x, y, w, h ).placeMonsters( x, y, w, h )
 				if ( rooms.length > 0 ) {
@@ -163,8 +177,28 @@ export class Dungeon extends Struct {
 		return x >= 0 && y >= 0 && x < this.width && y < this.height
 	}
 
+	getProp( x: number, y: number ): Prop | undefined {
+		let result: Prop | undefined = undefined
+		this.props.forEach( (prop) => {
+			if ( prop && (prop.x === x && prop.y === y )) {
+				result = prop
+				return
+			}
+		})
+		return result
+	}
+
+	isTileBlocked( x: number, y: number ): boolean {
+		return !this.isInside( x, y ) || this.getTile( x, y ).blocked 
+	}
+
+	isPropBlocked( x: number, y: number ): boolean {
+		const prop = this.getProp( x, y )
+		return prop !== undefined && prop.blocked
+	}
+
 	isBlocked( x: number, y: number ): boolean {
-		return !this.isInside( x, y ) || this.getTile( x, y ).blocked
+		return this.isTileBlocked( x, y ) || this.isPropBlocked( x, y )
 	}
 
 	isOpaque( x: number, y: number ): boolean {

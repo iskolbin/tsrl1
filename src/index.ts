@@ -19,9 +19,7 @@ function gameReducer( state = new GameState(), action: Action ) {
 	switch ( action.type ) {
 		case 'Init': {
 			const { width, height } = action
-			return state.set( 'dungeon', new Dungeon( {
-				width,
-				height,
+			return state.set( 'dungeon', new Dungeon( { width, height,
 				prng: new Prng( 123 ),
 				createBlockedTile: () => new Tile({ch: '#', color: '#101010', blocked: true, opaque: true }),
 				createFreeTile: () => new Tile({ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
@@ -29,33 +27,22 @@ function gameReducer( state = new GameState(), action: Action ) {
 		}
 
 		case 'SetTile': {
-			//const { x, y, w, h, ch, color, blocked, opaque } = action
-			//return state.setTile( x, y, w, h, () => new Tile( { ch, color, blocked, opaque } ))
-			return state
+			const { x, y, params } = action
+			return state.update( 'dungeon', dungeon => dungeon.setTile( x, y, new Tile( params )))
 		}
 
 		case 'AddProp': {
-			const { x, y, ch, color } = action
-			const prop = new Prop( {x: x, y: y, ch: ch, color: color})
-			return state.addProp( prop )
+			return state.addProp( new Prop( action.params ))
+		}
+
+		case 'AddPlayer': {
+			const params = {...action.params, ch: '@'}	
+			return state.addPlayer( new Prop( params ))
 		}
 
 		case 'MoveProp': {
 			const { id, dx, dy } = action
-			const prop = state.getProp( id )
-			if ( prop !== undefined ) {
-				const { x, y } = prop
-				if ( !state.dungeon.isBlocked( x + dx, y + dy )) {
-					let newState = state.updateProp( id, (prop: Prop) => prop	
-							.update( 'x', (x: number) => x + dx )
-							.update( 'y', (y: number) => y + dy ))
-					return newState.lights.illuminate( newState, x + dx, y + dy, 5 )
-				} else {
-					return state
-				}
-			} else {
-				return state
-			}
+			return state.moveProp( id, dx, dy )
 		}
 
 		case 'NextRandom': {
@@ -83,28 +70,23 @@ function render() {
 		}
 	})
 	state.dungeon.props.forEach( ({x, y, ch, color}: Prop ) => {
-		renderer.draw( ch, x, y, 1, 1, color )
+		const {visible} = state.dungeon.getTile( x, y )
+		if ( visible ) {
+			renderer.draw( ch, x, y, 1, 1, color )
+		}	
 	})
 }
 
 store.subscribe( render )
 
 store.dispatch( { type: 'Init', width: SCREEN_WIDTH, height: SCREEN_HEIGHT } )
-const playerId = store.getState().getNextPropId()
-store.dispatch( { type: 'AddProp', x: 9, y: 9, ch: '@', color: '#ff0000' } )
+store.dispatch( { type: 'AddPlayer', params: {x: 9, y: 9, color: '#ff0000' }} )
 
 const mapping: {[key:string]: () => any} = {
-	W: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: 0, dy: -1 } ),
-	A: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: -1, dy: 0 } ),
-	S: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: 0, dy: 1 } ),
-	D: () => store.dispatch( { type: 'MoveProp', id: playerId, dx: 1, dy: 0 } ),
-	X: () => {
-		store.dispatch( { type: 'NextRandom' } )
-		const dx = store.getState().random() <= 0.5 ? -1 : 1
-		store.dispatch( { type: 'NextRandom' } )
-		const dy = store.getState().random() <= 0.5 ? -1 : 1
-		store.dispatch( { type: 'MoveProp', id: playerId, dx: dx, dy: dy })
-	}
+	W: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 0, dy: -1 } ),
+	A: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: -1, dy: 0 } ),
+	S: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 0, dy: 1 } ),
+	D: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 1, dy: 0 } ),
 }
 
 controller.installKeyboard( mapping )
