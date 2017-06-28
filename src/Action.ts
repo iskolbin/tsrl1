@@ -1,3 +1,6 @@
+import * as Tile from './Tile'
+import * as Prop from './Prop'
+
 export interface Init {
 	kind: 'Init'
 	width: number
@@ -8,12 +11,7 @@ export interface SetTile {
 	kind: 'SetTile'
 	x: number
 	y: number
-	w: number
-	h: number
-	ch: string
-	color: string
-	blocked: boolean
-	opaque: boolean
+	params: Partial<Tile.Data>
 }
 
 export interface MoveProp {
@@ -24,11 +22,13 @@ export interface MoveProp {
 }
 
 export interface AddProp {
-	kind: 'AddProp'
-	x: number
-	y: number
-	ch: string
-	color: string
+	type: 'AddProp'
+	params: Partial<Prop.Data>
+}
+
+export interface AddPlayer {
+	type: 'AddPlayer'
+	params: Partial<Prop.Data>
 }
 
 export interface NextRandom {
@@ -39,5 +39,6 @@ export type Action
 	= Init
 	| MoveProp
 	| AddProp
+	| AddPlayer
 	| SetTile
 	| NextRandom

@@ -6,9 +6,14 @@
     "immutable": "3.8.1",
     "redux": "^3.6.0",
     "ts-loader": "^2.1.0",
+<<<<<<< HEAD
     "tspersistentprng": "^0.4.0",
     "tspersistentvector": "^0.5.10",
     "tsshadowcasting2d": "^0.2.6"
+=======
+    "tspersistentprng": "^0.3.3",
+    "tsshadowcasting2d": "^0.2.7"
+>>>>>>> 79972dd0530cab3f7e338fc2ec2a360f7b4a4397
   },
   "devDependencies": {
     "redux-devtools-extension": "^2.13.2",
