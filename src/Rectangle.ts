@@ -1,33 +1,51 @@
-export class Rectangle {
-	constructor(
-		public x: number,
-		public y: number,
-		public w: number,
-		public h: number
-	) {
-	}
+import * as Struct from './Struct'
 
-	get x0() { return this.x }
-	get x1() { return this.x + this.w }
-	get y0() { return this.y }
-	get y1() { return this.y + this.h }
+export interface Data {
+	x: number
+	y: number
+	w: number
+	h: number
+}
 
-	center(): [number,number] {
-		return [this.centerX(), this.centerY()]
-	}
+const DEFAULT = {
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0
+}
+
+export function make( params?: Partial<Data> ) {
+	return Struct.make( DEFAULT, params )
+}
+
+export function getX0( {x}: Data ) { 
+	return x
+}
+
+export function getX1( {x,w}: Data ) {
+	return x + w
+}
+
+export function getY0( {y}: Data ) {
+	return y
+}
+
+export function getY1( {y,h}: Data ) {
+	return y + h
+}
+
+export function centerX( {x,w}: Data ) {
+	return Math.floor(( this.x + this.x + this.w ) / 2)
+}
+
+export function centerY( {y,h}: Data ) {
+	return Math.floor(( this.y + this.y + this.h ) / 2)
+}
+
+export function center( rect: Data ): [number,number] {
+	return [this.centerX(), this.centerY()]
+}
 	
-	centerX() {
-		return Math.floor(( this.x + this.x + this.w ) / 2)
-	}
-
-	centerY() {
-		return Math.floor(( this.y + this.y + this.h ) / 2)
-	}
-
-	intersect( other: Rectangle ) {
-		return this.x0 <= other.x1
-			&& this.x1 >= other.x0
-			&& this.y0 <= other.y1
-			&& this.y1 >= other.y1
-	}
+export function intersect( {x,y,w,h}: Data, {x:x_,y:y_,w:w_,h:h_}: Data ) {
+	return x <= x_ + w_ && x_ <= x + w && y <= y_ + h_ && y_ <= y + h
 }

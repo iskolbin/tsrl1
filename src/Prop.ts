@@ -1,14 +1,19 @@
-import { Color } from './Color'
-import { Struct, init } from './Struct'
+import * as Struct from './Struct'
 
-export class Prop extends Struct {
-	x: number = 0
-	y: number = 0
-	ch: string = ' '
-	color: Color = '#000000'
+export interface Prop {
+	x: number
+	y: number
+	ch: string
+	color: string
+}
 
-	constructor( params?: Partial<Prop> ) {
-		super()
-		init<Prop>( this, params )
-	}
+const DEFAULT: Prop = {
+	x: 0,
+	y: 0,
+	ch: '',
+	color: '#000000'
+}
+
+export function make( params?: Partial<Prop> ): Prop {
+	return Struct.make( DEFAULT, params )
 }

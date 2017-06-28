@@ -1,16 +1,23 @@
-import { Struct, init } from './Struct'
-import { Color } from './Color'
+import * as Struct from './Struct'
 
-export class Tile extends Struct {
-	blocked: boolean = false
-	opaque: boolean = false
-	ch: string = ' '
-	color: Color = '#000000'
-	explored: boolean = false
-	visible: boolean = false
+export interface Data {
+	blocked: boolean
+	opaque: boolean
+	ch: string
+	color: string
+	explored: boolean
+	visible: boolean
+}
 
-	constructor( params?: Partial<Tile> ) {
-		super()
-		init<Tile>( this, params )
-	}
+const DEFAULT: Data = {
+	blocked: false,
+	opaque: false,
+	ch: ' ',
+	color: '#000000',
+	explored: false,
+	visible: false
+}
+
+export function make( params?: Partial<Data> ): Data {
+	return Struct.make( DEFAULT, params )
 }

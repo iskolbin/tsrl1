@@ -1,40 +1,38 @@
-import { Color } from './Color'
-
 export interface Init {
-	type: 'Init'
+	kind: 'Init'
 	width: number
 	height: number
 }
 
 export interface SetTile {
-	type: 'SetTile'
+	kind: 'SetTile'
 	x: number
 	y: number
 	w: number
 	h: number
 	ch: string
-	color: Color
+	color: string
 	blocked: boolean
 	opaque: boolean
 }
 
 export interface MoveProp {
-	type: 'MoveProp'
+	kind: 'MoveProp'
 	id: number
 	dx: number
 	dy: number
 }
 
 export interface AddProp {
-	type: 'AddProp'
+	kind: 'AddProp'
 	x: number
 	y: number
 	ch: string
-	color: Color
+	color: string
 }
 
 export interface NextRandom {
-	type: 'NextRandom'
+	kind: 'NextRandom'
 }
 
 export type Action

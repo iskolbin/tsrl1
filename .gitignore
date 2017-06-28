@@ -28,3 +28,4 @@ dist/bundle.js*
 dist/lib
 
 # Compiled files
+src/*.js
