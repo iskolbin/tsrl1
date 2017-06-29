@@ -1,6 +1,7 @@
 import * as Struct from './Struct'
 import * as Rectangle from './Rectangle'
 import * as Tile from './Tile'
+import * as Prop from './Prop'
 import * as Prng from 'tspersistentprng'
 import * as Vector from 'tspersistentvector'
 
@@ -8,13 +9,14 @@ export interface Data {
 	kind: 'Data'
 	width: number
 	height: number
-	tiles: Vector.Data<Tile>
+	tiles: Vector.Data<Tile.Data>
+	props: Vector.Data<Prop.Data>
 	prng: Prng.Data
 }
 
 export interface TileBrush {
-	createFreeTile: () => Tile.Data
-	createBlockedTile: () => Tile.Data
+	createFreeTile: (x: number, y: number) => Tile.Data
+	createBlockedTile: (x: number, y: number) => Tile.Data
 }
 
 const DEFAULT: Data = {
@@ -22,6 +24,7 @@ const DEFAULT: Data = {
 	width: 1,
 	height: 1,
 	tiles: Vector.NIL,
+	props: Vector.NIL,
 	prng: Prng.make()
 }
 
@@ -30,29 +33,34 @@ export function make( params?: Partial<Data> ): Data {
 }
 
 export function clear( dungeon: Data, brush: TileBrush ): Data {
-	let tiles = Vector.NIL
-	let i = 0
+	let tiles: Vector.Data<Tile.Data> = Vector.NIL
 	for ( let y = 0; y < dungeon.height; y++ ) {
 		for ( let x = 0; x < dungeon.width; x++ ) {
-			tiles = Vector.set( tiles, i++, brush.createBlockedTile() )
+			tiles = Vector.push( tiles, brush.createBlockedTile( x, y ))
 		}
 	}
 	return Struct.set( dungeon, 'tiles', tiles )
 }
 
-export function createRoom( dungeon: Data, x: number, y: number, w: number, h: number, brush: TileBrush ) {
-	return updateTileRect( dungeon, x, y, w, h, brush.createFreeTile )
+export function createRoom( dungeon: Data, x0: number, y0: number, width: number, height: number, brush: TileBrush ) {
+	let {tiles} = dungeon
+	for ( let x = x0; x < x0 + width; x++ ) {
+		for ( let y = y0; y < y0 + height; y++ ) {
+			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
+		}
+	}
+	return Struct.set( dungeon, 'tiles', tiles )
 }
 
 export function createTunnelH( dungeon: Data, x0: number, x1: number, y: number, brush: TileBrush ) {
 	let {tiles} = dungeon
 	if ( x0 < x1 ) {
 		for ( let x = x0; x < x1; x++ ) {
-			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile() )
+			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	} else {
 		for ( let x = x1; x < x0; x++ ) {
-			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile() )
+			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	}
 	return Struct.set( dungeon, 'tiles', tiles )
@@ -62,11 +70,11 @@ export function createTunnelV( dungeon: Data, y0: number, y1: number, x: number,
 	let {tiles} = dungeon
 	if ( y0 < y1 ) {
 		for ( let y = y0; y < y1; y++ ) {
-			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile() )
+			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	} else {
 		for ( let y = y1; y < y0; y++ ) {
-			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile() )
+			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	}
 	return Struct.set( dungeon, 'tiles', tiles )
@@ -169,9 +177,22 @@ export function isInside( dungeon: Data, x: number, y: number ): boolean {
 }
 
 export function isBlocked( dungeon: Data, x: number, y: number ): boolean {
-	return !isInside( dungeon, x, y ) || getTile( dungeon, x, y ).blocked
+	return !isInside( dungeon, x, y ) || (getTile( dungeon, x, y ) as Tile.Data).blocked
 }
 
 export function isOpaque( dungeon: Data, x: number, y: number ): boolean {
-	return !isInside( dungeon, x, y ) || getTile( dungeon, x, y ).opaque
+	return !isInside( dungeon, x, y ) || (getTile( dungeon, x, y ) as Tile.Data).opaque
+}
+
+export function isVisible( dungeon: Data, x: number, y: number ): boolean {
+	return isInside( dungeon, x, y ) && (getTile( dungeon, x, y ) as Tile.Data).visible
+}
+
+export function getPropAt( dungeon: Data, x0: number, y0: number ): Prop.Data | undefined {
+	return Vector.find( dungeon.props, ({x,y}) => x === x0 && y === y0 )
+}
+
+export function isExplored( dungeon: Data, x: number, y: number ): boolean {
+	const tile = getTile( dungeon, x, y )
+	return tile ? tile.explored : false
 }

@@ -1,15 +1,19 @@
 import * as Struct from './Struct'
 
 export interface Data {
-	blocked: boolean
-	opaque: boolean
+	x: number
+	y: number
 	ch: string
 	color: string
+	blocked: boolean
+	opaque: boolean
 	explored: boolean
 	visible: boolean
 }
 
 const DEFAULT: Data = {
+	x: 0,
+	y: 0,
 	blocked: false,
 	opaque: false,
 	ch: ' ',

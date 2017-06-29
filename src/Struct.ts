@@ -8,6 +8,7 @@ export function make<T>( defaultObj: T, kvs?: Partial<T> ): T {
 				result[k] = defaultObj[k]
 			}
 		}
+		return result
 	} else {
 		return defaultObj
 	}
@@ -44,13 +45,13 @@ export function set3<T, K1 extends keyof T, K2 extends keyof T[K1], K3 extends k
 	return result
 }
 
-
+	/*
 export function merge<T>( obj: T, kvs?: Partial<T> ): T {
 	if ( kvs ) {
 		const result = copy( obj )
 		for ( const k in kvs ) {
-			if ( kvs.hasOwnProperty( k )) {
-				obj[k] = kvs[k]
+			if ( kvs.hasOwnProperty( k ) && kvs[k] !== undefined ) {
+				result[k] = kvs[k]
 			}
 		}
 		return result
@@ -58,6 +59,7 @@ export function merge<T>( obj: T, kvs?: Partial<T> ): T {
 		return obj
 	}
 }
+	 */
 
 export function update<T, K extends keyof T>( obj: T, key: K, updater: (value: T[K], key: K, obj: T) => T[K] ): T {
 	return set( obj, key, updater( obj[key], key, obj ))

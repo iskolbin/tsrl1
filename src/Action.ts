@@ -2,20 +2,20 @@ import * as Tile from './Tile'
 import * as Prop from './Prop'
 
 export interface Init {
-	kind: 'Init'
+	type: 'Init'
 	width: number
 	height: number
 }
 
 export interface SetTile {
-	kind: 'SetTile'
+	type: 'SetTile'
 	x: number
 	y: number
 	params: Partial<Tile.Data>
 }
 
 export interface MoveProp {
-	kind: 'MoveProp'
+	type: 'MoveProp'
 	id: number
 	dx: number
 	dy: number
@@ -32,7 +32,7 @@ export interface AddPlayer {
 }
 
 export interface NextRandom {
-	kind: 'NextRandom'
+	type: 'NextRandom'
 }
 
 export type Action

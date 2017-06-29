@@ -19,10 +19,10 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new webpack.optimize.UglifyJsPlugin({
-			compress: true,
-			mangle: true
-		})
+//		new webpack.optimize.UglifyJsPlugin({
+//			compress: true,
+//			mangle: true
+//		})
 	],
 	externals: {
 //		"react": "React",

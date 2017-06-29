@@ -35,15 +35,15 @@ export function getY1( {y,h}: Data ) {
 }
 
 export function centerX( {x,w}: Data ) {
-	return Math.floor(( this.x + this.x + this.w ) / 2)
+	return Math.floor(( x + x + w ) / 2)
 }
 
 export function centerY( {y,h}: Data ) {
-	return Math.floor(( this.y + this.y + this.h ) / 2)
+	return Math.floor(( y + y + h ) / 2)
 }
 
 export function center( rect: Data ): [number,number] {
-	return [this.centerX(), this.centerY()]
+	return [centerX( rect ), centerY( rect )]
 }
 	
 export function intersect( {x,y,w,h}: Data, {x:x_,y:y_,w:w_,h:h_}: Data ) {

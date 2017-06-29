@@ -23,3 +23,11 @@ const DEFAULT: Data = {
 export function make( params?: Partial<Data> ): Data {
 	return Struct.make( DEFAULT, params )
 }
+
+export function setCoord( prop: Data, x: number, y: number ): Data {
+	return {...prop, x, y}
+}
+
+export function updateCoord( prop: Data, updateX: (x: number) => number, updateY: (y: number) => number ): Data {
+	return {...prop, x: updateX( prop.x ), y: updateY( prop.y )}
+}

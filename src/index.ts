@@ -1,11 +1,15 @@
 import { Action } from './Action'
-import { Tile } from './Tile'
-import { Prop } from './Prop'
-import { GameState } from './GameState'
-import { Prng } from 'tspersistentprng'
+import * as Struct from './Struct'
+import * as Tile from './Tile'
+import * as Prop from './Prop'
+import * as GameState from './GameState'
+import * as Dungeon from './Dungeon'
+
+import * as Prng from 'tspersistentprng'
+import * as Vector from 'tspersistentvector'
+
 import { createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import { Dungeon } from './Dungeon'
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
 
@@ -15,38 +19,41 @@ const SCREEN_HEIGHT = 30
 const controller = new Html5WindowController()
 const renderer = new Html5CanvasRenderer( 'root', SCREEN_WIDTH, SCREEN_HEIGHT, { fontFamily: 'monospace', fontSize: 24 } )
 
-function gameReducer( state = new GameState(), action: Action ) {
+function gameReducer( state = GameState.make(), action: Action ) {
 	switch ( action.type ) {
 		case 'Init': {
 			const { width, height } = action
-			return state.set( 'dungeon', new Dungeon( { width, height,
-				prng: new Prng( 123 ),
-				createBlockedTile: () => new Tile({ch: '#', color: '#101010', blocked: true, opaque: true }),
-				createFreeTile: () => new Tile({ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
-			}).clear().generate( 5, 3, 20 ))
+			const brush = {
+				createBlockedTile: (x: number, y: number) => Tile.make({x, y, ch: '#', color: '#101010', blocked: true, opaque: true }),
+				createFreeTile: (x: number, y: number) => Tile.make({x, y, ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
+			}
+			let dungeon = Dungeon.make( {width,height, prng: Prng.make( 123 )} )
+			dungeon = Dungeon.clear( dungeon, brush )
+			dungeon = Dungeon.generate( dungeon, 5, 3, 20, brush )
+			return Struct.set( state, 'dungeon', dungeon )
 		}
 
 		case 'SetTile': {
 			const { x, y, params } = action
-			return state.update( 'dungeon', dungeon => dungeon.setTile( x, y, new Tile( params )))
+			return Struct.update( state, 'dungeon', dungeon => Dungeon.setTile( dungeon, x, y, Tile.make( params )))
 		}
 
 		case 'AddProp': {
-			return state.addProp( new Prop( action.params ))
+			return GameState.addProp( state, Prop.make( action.params ))
 		}
 
 		case 'AddPlayer': {
-			const params = {...action.params, ch: '@'}	
-			return state.addPlayer( new Prop( params ))
+			const params = {...action.params, ch: '@'}
+			return GameState.addPlayer( state, Prop.make( params ))
 		}
 
 		case 'MoveProp': {
 			const { id, dx, dy } = action
-			return state.moveProp( id, dx, dy )
+			return GameState.moveProp( state, id, dx, dy )
 		}
 
 		case 'NextRandom': {
-			return state.nextRandom()
+			return GameState.nextRandom( state )
 		}
 
 		default: {
@@ -58,20 +65,19 @@ function gameReducer( state = new GameState(), action: Action ) {
 const store = createStore( gameReducer, undefined, composeWithDevTools())
 
 function render() {
-	const state: GameState = store.getState()
+	const state: GameState.Data = store.getState()
 	renderer.clear()
 	let i = 0
-	state.dungeon.tiles.forEach( ({ch, color, explored,visible}: Tile ) => {
-		const [x,y] = state.dungeon.getTileXy( i++ )
+	Vector.forEach( state.dungeon.tiles, ({ch, color, explored,visible}) => {
+		const [x,y] = Dungeon.getTileXy( state.dungeon, i++ )
 		if ( visible ) {
 			renderer.draw( ch, x, y, 1, 1, color )
 		} else {
 			renderer.draw( explored ? ch : '?', x, y, 1, 1, '#000' )
 		}
 	})
-	state.dungeon.props.forEach( ({x, y, ch, color}: Prop ) => {
-		const {visible} = state.dungeon.getTile( x, y )
-		if ( visible ) {
+	Vector.forEach( state.dungeon.props, ({x, y, ch, color}) => {
+		if ( Dungeon.isVisible( state.dungeon, x, y )) {
 			renderer.draw( ch, x, y, 1, 1, color )
 		}	
 	})
