@@ -1,15 +1,16 @@
+import * as Prng from 'tspersistentprng'
+import * as Vector from 'tspersistentvector'
+import { createStore } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
+
 import { Action } from './Action'
 import * as Struct from './Struct'
 import * as Tile from './Tile'
 import * as Prop from './Prop'
 import * as GameState from './GameState'
 import * as Dungeon from './Dungeon'
+import { Tiles } from './data/Tiles'
 
-import * as Prng from 'tspersistentprng'
-import * as Vector from 'tspersistentvector'
-
-import { createStore } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
 import { Html5CanvasRenderer } from './backend/html5/Html5CanvasRenderer'
 import { Html5WindowController } from './backend/html5/Html5WindowController'
 
@@ -24,8 +25,8 @@ function gameReducer( state = GameState.make(), action: Action ) {
 		case 'Init': {
 			const { width, height } = action
 			const brush = {
-				createBlockedTile: (x: number, y: number) => Tile.make({x, y, ch: '#', color: '#101010', blocked: true, opaque: true  }),
-				createFreeTile: (x: number, y: number) => Tile.make({x, y, ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
+				createBlockedTile: (x: number, y: number) => Tile.makeAt( x, y, Tiles.DungeonWall ),
+				createFreeTile: (x: number, y: number) => Tile.makeAt( x, y, Tiles.DungeonFloor ),
 			}
 			let dungeon = Dungeon.make( {width,height, prng: Prng.make( 123 )} )
 			dungeon = Dungeon.clear( dungeon, brush )

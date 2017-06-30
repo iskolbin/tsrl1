@@ -25,3 +25,7 @@ const DEFAULT: Data = {
 export function make( params?: Partial<Data> ): Data {
 	return Struct.make( DEFAULT, params )
 }
+
+export function makeAt( x: number, y: number, params?: Partial<Data> ): Data {
+	return Struct.make( make( params ), { x, y } )
+}

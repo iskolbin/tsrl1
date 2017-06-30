@@ -125,7 +125,6 @@ export function setTile( dungeon: Data, x: number, y: number, tile: Tile.Data ) 
 export function updateTile( dungeon: Data, x: number, y: number, updater: (tile: Tile.Data) => Tile.Data ) {
 	if ( x >= 0 && x < dungeon.width && y >= 0 && y < dungeon.height ) {
 		return Struct.update( dungeon, 'tiles', tiles => Vector.update( tiles, getTileIndex( dungeon, x, y ), updater ))
-		//	return this.set( 'tiles', this.tiles.set( this.getTileIndex( x, y ), fTile( x, y, this.getTile( x, y ))))
 	} else {
 		return dungeon
 	}

@@ -1,8 +1,9 @@
-import * as Prop from './Prop'
-import * as Dungeon from './Dungeon'
 import * as Vector from 'tspersistentvector'
 import * as Prng from 'tspersistentprng'
 import * as ShadowCasting2D from 'tsshadowcasting2d'
+
+import * as Prop from './Prop'
+import * as Dungeon from './Dungeon'
 import * as Tile from './Tile'
 import * as Struct from './Struct'
 
