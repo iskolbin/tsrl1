@@ -2069,9 +2069,9 @@ ts-loader@^2.1.0:
     loader-utils "^1.0.2"
     semver "^5.0.1"
 
-tspersistentprng@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/tspersistentprng/-/tspersistentprng-0.4.0.tgz#e1469ab3c3844ca38e7ff068cf257d9e6885308d"
+tspersistentprng@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/tspersistentprng/-/tspersistentprng-0.4.1.tgz#c87cb7879928675b90a220e4bcfec7b111302970"
 
 tspersistentvector@^0.5.11:
   version "0.5.11"

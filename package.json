@@ -6,7 +6,7 @@
     "immutable": "3.8.1",
     "redux": "^3.6.0",
     "ts-loader": "^2.1.0",
-    "tspersistentprng": "^0.4.0",
+    "tspersistentprng": "^0.4.1",
     "tspersistentvector": "^0.5.11",
     "tsshadowcasting2d": "^0.3.3"
   },
