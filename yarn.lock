@@ -2077,9 +2077,9 @@ tspersistentvector@^0.5.11:
   version "0.5.11"
   resolved "https://registry.yarnpkg.com/tspersistentvector/-/tspersistentvector-0.5.11.tgz#508db019c3268c1e41e7e4ef3f44cd7dd03e9f02"
 
-tsshadowcasting2d@^0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/tsshadowcasting2d/-/tsshadowcasting2d-0.3.2.tgz#c28fd591862969fadc33a8275f6ee17188f8fbf1"
+tsshadowcasting2d@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/tsshadowcasting2d/-/tsshadowcasting2d-0.3.3.tgz#5716856440db0cdba7f04237008e7ec74fb05165"
 
 tty-browserify@0.0.0:
   version "0.0.0"

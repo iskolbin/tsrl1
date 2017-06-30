@@ -24,7 +24,7 @@ function gameReducer( state = GameState.make(), action: Action ) {
 		case 'Init': {
 			const { width, height } = action
 			const brush = {
-				createBlockedTile: (x: number, y: number) => Tile.make({x, y, ch: '#', color: '#101010', blocked: true, opaque: true }),
+				createBlockedTile: (x: number, y: number) => Tile.make({x, y, ch: '#', color: '#101010', blocked: true, opaque: true  }),
 				createFreeTile: (x: number, y: number) => Tile.make({x, y, ch: '.', color: '#a0a0a0', blocked: false, opaque: false })
 			}
 			let dungeon = Dungeon.make( {width,height, prng: Prng.make( 123 )} )
@@ -86,7 +86,7 @@ function render() {
 store.subscribe( render )
 
 store.dispatch( { type: 'Init', width: SCREEN_WIDTH, height: SCREEN_HEIGHT } )
-store.dispatch( { type: 'AddPlayer', params: {x: 9, y: 9, color: '#ff0000' }} )
+store.dispatch( { type: 'AddPlayer', params: {x: 3, y: 6, color: '#ff0000' }} )
 
 const mapping: {[key:string]: () => any} = {
 	W: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 0, dy: -1 } ),

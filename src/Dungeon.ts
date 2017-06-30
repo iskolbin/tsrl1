@@ -6,7 +6,6 @@ import * as Prng from 'tspersistentprng'
 import * as Vector from 'tspersistentvector'
 
 export interface Data {
-	kind: 'Data'
 	width: number
 	height: number
 	tiles: Vector.Data<Tile.Data>
@@ -20,7 +19,6 @@ export interface TileBrush {
 }
 
 const DEFAULT: Data = {
-	kind: 'Data',
 	width: 1,
 	height: 1,
 	tiles: Vector.NIL,

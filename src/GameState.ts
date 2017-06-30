@@ -77,8 +77,8 @@ function updatePlayerVisibility( state: Data ) {
 }
 
 export function addPlayer( state: Data, prop: Prop.Data ) {
-	state = Struct.update2( state, 'dungeon', 'props', props => Vector.push( props, prop ))
 	state = Struct.set( state, 'playerId', getNextPropId( state ))
+	state = Struct.update2( state, 'dungeon', 'props', props => Vector.push( props, prop ))
 	return updatePlayerVisibility( state )
 }
 

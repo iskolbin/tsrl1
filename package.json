@@ -8,7 +8,7 @@
     "ts-loader": "^2.1.0",
     "tspersistentprng": "^0.4.0",
     "tspersistentvector": "^0.5.11",
-    "tsshadowcasting2d": "^0.3.2"
+    "tsshadowcasting2d": "^0.3.3"
   },
   "devDependencies": {
     "redux-devtools-extension": "^2.13.2",
