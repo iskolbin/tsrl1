@@ -30,7 +30,7 @@ function gameReducer( state = GameState.make(), action: Action ) {
 			}
 			let dungeon = Dungeon.make( {width,height, prng: Prng.make( 123 )} )
 			dungeon = Dungeon.clear( dungeon, brush )
-			dungeon = Dungeon.generate( dungeon, 5, 3, 20, brush )
+			dungeon = Dungeon.generate( dungeon, 4, 6, 3, brush )
 			return Struct.set( state, 'dungeon', dungeon )
 		}
 

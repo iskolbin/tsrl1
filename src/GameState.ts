@@ -6,6 +6,7 @@ import * as Prop from './Prop'
 import * as Dungeon from './Dungeon'
 import * as Tile from './Tile'
 import * as Struct from './Struct'
+import * as Rectangle from './Rectangle'
 
 export interface Data {
 	playerId: number
@@ -79,6 +80,9 @@ function updatePlayerVisibility( state: Data ) {
 
 export function addPlayer( state: Data, prop: Prop.Data ) {
 	state = Struct.set( state, 'playerId', getNextPropId( state ))
+	const {x,y,w,h} = Vector.get( state.dungeon.rooms, random( state, 0, state.dungeon.rooms.size ) | 0 ) as Rectangle.Data
+	state = nextRandom( state )
+	prop = {...prop, x: (x + 0.5*w)|0, y: (y + 0.5*h)|0 }
 	state = Struct.update2( state, 'dungeon', 'props', props => Vector.push( props, prop ))
 	return updatePlayerVisibility( state )
 }

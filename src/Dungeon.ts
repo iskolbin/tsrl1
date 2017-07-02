@@ -9,6 +9,7 @@ export interface Data {
 	width: number
 	height: number
 	tiles: Vector.Data<Tile.Data>
+	rooms: Vector.Data<Rectangle.Data>
 	props: Vector.Data<Prop.Data>
 	prng: Prng.Data
 }
@@ -22,6 +23,7 @@ const DEFAULT: Data = {
 	width: 1,
 	height: 1,
 	tiles: Vector.NIL,
+	rooms: Vector.NIL,
 	props: Vector.NIL,
 	prng: Prng.make()
 }
@@ -53,11 +55,11 @@ export function createRoom( dungeon: Data, x0: number, y0: number, width: number
 export function createTunnelH( dungeon: Data, x0: number, x1: number, y: number, brush: TileBrush ) {
 	let {tiles} = dungeon
 	if ( x0 < x1 ) {
-		for ( let x = x0; x < x1; x++ ) {
+		for ( let x = x0; x <= x1; x++ ) {
 			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	} else {
-		for ( let x = x1; x < x0; x++ ) {
+		for ( let x = x1; x <= x0; x++ ) {
 			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	}
@@ -67,11 +69,11 @@ export function createTunnelH( dungeon: Data, x0: number, x1: number, y: number,
 export function createTunnelV( dungeon: Data, y0: number, y1: number, x: number, brush: TileBrush ) {
 	let {tiles} = dungeon
 	if ( y0 < y1 ) {
-		for ( let y = y0; y < y1; y++ ) {
+		for ( let y = y0; y <= y1; y++ ) {
 			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	} else {
-		for ( let y = y1; y < y0; y++ ) {
+		for ( let y = y1; y <= y0; y++ ) {
 			tiles = Vector.set( tiles, getTileIndex( dungeon, x, y ), brush.createFreeTile(x,y) )
 		}
 	}
@@ -82,6 +84,7 @@ export function generate( dungeon: Data, minSize: number, maxSize: number, count
 	let current: Data = dungeon
 	let {width, height, prng} = dungeon
 	let rooms: Rectangle.Data[] = []
+	count = 10
 	for ( let i = 0; i < count; i++ ) {
 		let failed = false
 		prng = Prng.next( prng )
@@ -89,9 +92,9 @@ export function generate( dungeon: Data, minSize: number, maxSize: number, count
 		prng = Prng.next( prng )
 		const h = Prng.random( prng, minSize, maxSize ) | 0
 		prng = Prng.next( prng )
-		const x = Prng.random( prng, 0, width - w - 1 ) | 0
+		const x = Prng.random( prng, 1, width - w - 1 ) | 0
 		prng = Prng.next( prng )
-		const y = Prng.random( prng, 0, height - h - 1 ) | 0
+		const y = Prng.random( prng, 1, height - h - 1 ) | 0
 		const newRoom: Rectangle.Data = Rectangle.make( {x, y, w, h} )
 		for ( const room of rooms ) {
 			if ( Rectangle.intersect( newRoom, room )) {
@@ -102,17 +105,19 @@ export function generate( dungeon: Data, minSize: number, maxSize: number, count
 		if ( !failed ) {
 			current = createRoom( current, x, y, w, h, brush )
 			if ( rooms.length > 0 ) {
+				const [cx,cy] = Rectangle.center( newRoom )
 				const [prevX,prevY] = Rectangle.center( rooms[rooms.length-1] )
 				prng = Prng.next( prng )
 				if ( Prng.random( prng ) <= 0.5 ) {
-					current = createTunnelH( current, prevX, x, y, brush ) 
-					current = createTunnelV( current, prevY, y, x, brush )
+					current = createTunnelH( current, prevX, cx, cy, brush ) 
+					current = createTunnelV( current, prevY, cy, prevX, brush )
 				} else {
-					current = createTunnelV( current, prevY, y, x, brush )
-					current = createTunnelH( current, prevX, x, y, brush )
+					current = createTunnelV( current, prevY, cy, cx, brush )
+					current = createTunnelH( current, prevX, cx, prevY, brush )
 				}
 			}
 			rooms.push( newRoom )
+			current = Struct.set( current, 'rooms', Vector.push( current.rooms, newRoom ))
 		}
 	}
 	return Struct.set( current, 'prng', prng )
