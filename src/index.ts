@@ -65,8 +65,12 @@ function gameReducer( state = GameState.make(), action: Action ) {
 
 const store = createStore( gameReducer, undefined, composeWithDevTools())
 
+function getCurrentState(): GameState.Data {
+	return store.getState() as GameState.Data
+}
+
 function render() {
-	const state: GameState.Data = store.getState()
+	const state = getCurrentState()
 	renderer.clear()
 	let i = 0
 	Vector.forEach( state.dungeon.tiles, ({ch, color, explored,visible}) => {
@@ -90,10 +94,10 @@ store.dispatch( { type: 'Init', width: SCREEN_WIDTH, height: SCREEN_HEIGHT } )
 store.dispatch( { type: 'AddPlayer', params: {x: 3, y: 6, color: '#ff0000' }} )
 
 const mapping: {[key:string]: () => any} = {
-	W: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 0, dy: -1 } ),
-	A: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: -1, dy: 0 } ),
-	S: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 0, dy: 1 } ),
-	D: () => store.dispatch( { type: 'MoveProp', id: store.getState().playerId, dx: 1, dy: 0 } ),
+	W: () => store.dispatch( { type: 'MoveProp', id: getCurrentState().playerId, dx: 0, dy: -1 } ),
+	A: () => store.dispatch( { type: 'MoveProp', id: getCurrentState().playerId, dx: -1, dy: 0 } ),
+	S: () => store.dispatch( { type: 'MoveProp', id: getCurrentState().playerId, dx: 0, dy: 1 } ),
+	D: () => store.dispatch( { type: 'MoveProp', id: getCurrentState().playerId, dx: 1, dy: 0 } ),
 }
 
 controller.installKeyboard( mapping )
